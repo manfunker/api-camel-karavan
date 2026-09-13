@@ -1,0 +1,314 @@
+- restConfiguration:
+    component: platform-http
+    enableCORS: true
+- rest:
+    id: api-rest
+    path: /api
+    produces: application/json
+    delete:
+      - id: delete-ab78
+        path: /clientes/{id}
+        to: direct:deleteItem
+    get:
+      - id: get-ed0f
+        path: /clientes
+        to: direct:getAllclientes
+      - id: get-a331
+        path: /clientes/{id}
+        to: direct:getItemById
+    post:
+      - id: post-b05f
+        path: /clientes
+        to: direct:createItem
+        consumes: application/json
+    put:
+      - id: put-76db
+        path: /clientes/{id}
+        to: direct:updateItem
+        consumes: application/json
+- route:
+    id: getAllclientes
+    description: getAllClients
+    from:
+      id: from-d90c
+      uri: direct
+      parameters:
+        name: getAllclientes
+      steps:
+        - to:
+            id: to-485d
+            uri: kamelet:mariadb-sink
+            parameters:
+              username: "{{spring.datasource.username}}"
+              password: "{{spring.datasource.password}}"
+              serverPort: 3306
+              serverName: localhost
+              databaseName: byrdb
+              query: |-
+                SELECT id, nombre, apellido, email, rut,
+                DATE_FORMAT(fecha_nacimiento, '%Y-%m-%d') AS fecha_nacimiento, 
+                telefono FROM clientes
+        - choice:
+            id: choice-b700
+            when:
+              - id: when-8350
+                expression:
+                  simple:
+                    id: simple-76cf
+                    expression: ${body} == '[]'
+                steps:
+                  - setHeader:
+                      id: setHeader-83e8
+                      name: Exchange.HTTP_RESPONSE_CODE
+                      expression:
+                        constant:
+                          id: constant-07bd
+                          expression: "404"
+                  - setBody:
+                      id: setBody-3712
+                      expression:
+                        constant:
+                          id: constant-e305
+                          expression: "{\"message\": \"Item not found\"}"
+            otherwise:
+              id: otherwise-f9ef
+              steps:
+                - setHeader:
+                    id: setHeader-b09b
+                    name: Exchange.HTTP_RESPONSE_CODE
+                    expression:
+                      constant:
+                        id: constant-9001
+                        expression: "200"
+                - marshal:
+                    id: marshal-6e0f
+                    json:
+                      id: json-1ebf
+                      prettyPrint: true
+                      library: Jackson
+- route:
+    id: getItemById
+    description: getClienteById
+    from:
+      id: from-0939
+      uri: direct
+      parameters:
+        name: getItemById
+      steps:
+        - to:
+            id: to-485e
+            uri: kamelet:mariadb-sink
+            parameters:
+              username: "{{spring.datasource.username}}"
+              password: "{{spring.datasource.password}}"
+              serverPort: 3306
+              serverName: localhost
+              query: |-
+                SELECT id, nombre, apellido, email, rut,
+                DATE_FORMAT(fecha_nacimiento, '%Y-%m-%d') AS fecha_nacimiento, 
+                telefono FROM clientes WHERE id = :#${header.id}?
+              databaseName: byrdb
+        - choice:
+            id: choice-8747
+            when:
+              - id: when-b2ff
+                expression:
+                  simple:
+                    id: simple-c46e
+                    expression: ${body} == '[]'
+                steps:
+                  - setHeader:
+                      id: setHeader-521b
+                      name: Exchange.HTTP_RESPONSE_CODE
+                      expression:
+                        constant:
+                          id: constant-4008
+                          expression: "404"
+                  - setBody:
+                      id: setBody-4b96
+                      expression:
+                        constant:
+                          id: constant-25d3
+                          expression: "{\"message\": \"Item not found\"}"
+            otherwise:
+              id: otherwise-c4a6
+              steps:
+                - setHeader:
+                    id: setHeader-e9a6
+                    name: Exchange.HTTP_RESPONSE_CODE
+                    expression:
+                      constant:
+                        id: constant-4143
+                        expression: "200"
+                - marshal:
+                    id: marshal-57b2
+                    json:
+                      id: json-e32b
+- route:
+    id: createClient
+    description: createClient
+    from:
+      id: from-464f
+      uri: direct
+      parameters:
+        name: createItem
+      steps:
+        - to:
+            id: to-ec59
+            uri: kamelet:mariadb-sink
+            parameters:
+              query: >-
+                INSERT INTO clientes (name, description, price) VALUES
+                (:#${body[name]}, :#${body[description]}, :#${body[price]})
+              username: "{{spring.datasource.username}}"
+              password: "{{spring.datasource.password}}"
+              serverName: localhost
+              serverPort: 3306
+              databaseName: byrdb
+        - choice:
+            id: choice-3e93
+            when:
+              - id: when-8e64
+                expression:
+                  simple:
+                    id: simple-2d4b
+                    expression: ${header.CamelSqlUpdateCount} > 0
+                steps:
+                  - setHeader:
+                      id: setHeader-7acc
+                      name: Exchange.HTTP_RESPONSE_CODE
+                      expression:
+                        constant:
+                          id: constant-9a59
+                          expression: "201"
+                  - setBody:
+                      id: setBody-e86a
+                      expression:
+                        constant:
+                          id: constant-792e
+                          expression: "{\"message\": \"Item created successfully\"}"
+            otherwise:
+              id: otherwise-b998
+              steps:
+                - setHeader:
+                    id: setHeader-61c7
+                    name: Exchange.HTTP_RESPONSE_CODE
+                    expression:
+                      constant:
+                        id: constant-8836
+                        expression: "500"
+                - marshal:
+                    id: marshal-a9af
+                    json:
+                      id: json-f1f5
+- route:
+    id: updateClient
+    description: updateClient
+    from:
+      id: from-47e8
+      uri: direct
+      parameters:
+        name: updateItem
+      steps:
+        - to:
+            id: to-0f99
+            uri: kamelet:mariadb-sink
+            parameters:
+              query: >-
+                UPDATE clientes SET nombre = :#${body[nombre]}, apellido =
+                :#${body[apellido]}, email = :#${body[email]}, rut =
+                :#${body[rut]}, fecha_nacimiento = :#${body[fecha_nacimiento]},
+                telefono = :#${body[telefono]} WHERE id = :#${header.id}
+              username: "{{spring.datasource.username}}"
+              serverName: localhost
+              serverPort: 3306
+              password: "{{spring.datasource.password}}"
+              databaseName: byrdb
+        - choice:
+            id: choice-8667
+            when:
+              - id: when-cb91
+                expression:
+                  simple:
+                    id: simple-fb40
+                    expression: ${header.CamelSqlUpdateCount} > 0
+                steps:
+                  - setHeader:
+                      id: setHeader-0877
+                      name: Exchange.HTTP_RESPONSE_CODE
+                      expression:
+                        constant:
+                          id: constant-987d
+                          expression: "200"
+                  - setBody:
+                      id: setBody-a5ee
+                      expression:
+                        constant:
+                          id: constant-df3d
+                          expression: "{\"message\": \"Item updated successfully\"}"
+            otherwise:
+              id: otherwise-4e9b
+              steps:
+                - setHeader:
+                    id: setHeader-05d8
+                    name: Exchange.HTTP_RESPONSE_CODE
+                    expression:
+                      constant:
+                        id: constant-8c1d
+                        expression: "404"
+                - setBody:
+                    id: setBody-69dc
+                    expression:
+                      constant:
+                        id: constant-c830
+                        expression: "{\"message\": \"Item not found\"}"
+- route:
+    id: deleteClient
+    description: deleteClient
+    from:
+      id: from-4941
+      uri: direct
+      parameters:
+        name: deleteItem
+      steps:
+        - to:
+            id: to-b37a
+            uri: kamelet:mariadb-sink
+            parameters:
+              query: DELETE FROM clientes WHERE id = :#${header.id}
+              databaseName: byrdb
+              username: "{{spring.datasource.username}}"
+              password: "{{spring.datasource.password}}"
+              serverName: localhost
+              serverPort: 3306
+        - choice:
+            id: choice-878d
+            when:
+              - id: when-3a7b
+                expression:
+                  simple:
+                    id: simple-b6d6
+                    expression: ${header.CamelSqlUpdateCount} > 0
+                steps:
+                  - setBody:
+                      id: setBody-5540
+                      expression:
+                        constant:
+                          id: constant-64cf
+                          expression: "{\"message\": \"Item deleted successfully\"}"
+            otherwise:
+              id: otherwise-8d31
+              steps:
+                - setHeader:
+                    id: setHeader-c28b
+                    name: Exchange.HTTP_RESPONSE_CODE
+                    expression:
+                      constant:
+                        id: constant-599a
+                        expression: "500"
+                - setBody:
+                    id: setBody-4b84
+                    expression:
+                      constant:
+                        id: constant-9fc2
+                        expression: "{\"message\": \"Item not found\"}"
