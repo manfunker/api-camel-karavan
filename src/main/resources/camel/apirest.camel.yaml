@@ -44,7 +44,7 @@
             parameters:
               username: "{{spring.datasource.username}}"
               password: "{{spring.datasource.password}}"
-              serverPort: "{{server.port}}"
+              serverPort: 18273
               serverName: mysql-23bdb174-karavan-project-api.d.aivencloud.com
               databaseName: defaultdb
               query: |-
@@ -104,7 +104,7 @@
             parameters:
               username: "{{spring.datasource.username}}"
               password: "{{spring.datasource.password}}"
-              serverPort: "{{server.port}}"
+              serverPort: 18273
               serverName: mysql-23bdb174-karavan-project-api.d.aivencloud.com
               query: |-
                 SELECT id, nombre, apellido, email, rut,
@@ -166,7 +166,7 @@
               username: "{{spring.datasource.username}}"
               password: "{{spring.datasource.password}}"
               serverName: mysql-23bdb174-karavan-project-api.d.aivencloud.com
-              serverPort: "{{server.port}}"
+              serverPort: 18273
               databaseName: defaultdb
         - choice:
             id: choice-3e93
@@ -224,7 +224,7 @@
                 telefono = :#${body[telefono]} WHERE id = :#${header.id}
               username: "{{spring.datasource.username}}"
               serverName: mysql-23bdb174-karavan-project-api.d.aivencloud.com
-              serverPort: "{{server.port}}"
+              serverPort: 18273
               password: "{{spring.datasource.password}}"
               databaseName: defaultdb
         - choice:
@@ -283,7 +283,7 @@
               username: "{{spring.datasource.username}}"
               password: "{{spring.datasource.password}}"
               serverName: mysql-23bdb174-karavan-project-api.d.aivencloud.com
-              serverPort: "{{server.port}}"
+              serverPort: 18273
         - choice:
             id: choice-878d
             when:
