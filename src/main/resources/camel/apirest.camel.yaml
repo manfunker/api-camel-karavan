@@ -41,9 +41,9 @@
             parameters:
               username: "{{spring.datasource.username}}"
               password: "{{spring.datasource.password}}"
-              serverPort: 3306
-              serverName: localhost
-              databaseName: byrdb
+              serverPort: "{{server.port}}"
+              serverName: mysql-23bdb174-karavan-project-api.d.aivencloud.com
+              databaseName: defaultdb
               query: |-
                 SELECT id, nombre, apellido, email, rut,
                 DATE_FORMAT(fecha_nacimiento, '%Y-%m-%d') AS fecha_nacimiento, 
@@ -101,13 +101,13 @@
             parameters:
               username: "{{spring.datasource.username}}"
               password: "{{spring.datasource.password}}"
-              serverPort: 3306
-              serverName: localhost
+              serverPort: "{{server.port}}"
+              serverName: mysql-23bdb174-karavan-project-api.d.aivencloud.com
               query: |-
                 SELECT id, nombre, apellido, email, rut,
                 DATE_FORMAT(fecha_nacimiento, '%Y-%m-%d') AS fecha_nacimiento, 
                 telefono FROM clientes WHERE id = :#${header.id}?
-              databaseName: byrdb
+              databaseName: defaultdb
         - choice:
             id: choice-8747
             when:
@@ -162,9 +162,9 @@
                 (:#${body[name]}, :#${body[description]}, :#${body[price]})
               username: "{{spring.datasource.username}}"
               password: "{{spring.datasource.password}}"
-              serverName: localhost
-              serverPort: 3306
-              databaseName: byrdb
+              serverName: mysql-23bdb174-karavan-project-api.d.aivencloud.com
+              serverPort: "{{server.port}}"
+              databaseName: defaultdb
         - choice:
             id: choice-3e93
             when:
@@ -220,10 +220,10 @@
                 :#${body[rut]}, fecha_nacimiento = :#${body[fecha_nacimiento]},
                 telefono = :#${body[telefono]} WHERE id = :#${header.id}
               username: "{{spring.datasource.username}}"
-              serverName: localhost
-              serverPort: 3306
+              serverName: mysql-23bdb174-karavan-project-api.d.aivencloud.com
+              serverPort: "{{server.port}}"
               password: "{{spring.datasource.password}}"
-              databaseName: byrdb
+              databaseName: defaultdb
         - choice:
             id: choice-8667
             when:
@@ -276,11 +276,11 @@
             uri: kamelet:mariadb-sink
             parameters:
               query: DELETE FROM clientes WHERE id = :#${header.id}
-              databaseName: byrdb
+              databaseName: defaultdb
               username: "{{spring.datasource.username}}"
               password: "{{spring.datasource.password}}"
-              serverName: localhost
-              serverPort: 3306
+              serverName: mysql-23bdb174-karavan-project-api.d.aivencloud.com
+              serverPort: "{{server.port}}"
         - choice:
             id: choice-878d
             when:
