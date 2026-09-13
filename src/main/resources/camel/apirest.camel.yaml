@@ -35,6 +35,9 @@
       parameters:
         name: getAllclientes
       steps:
+        - log:
+            id: log-dfb4
+            message: "ESTA ES UNA PRUEBA    :   [. ${body}.  ]"
         - to:
             id: to-485d
             uri: kamelet:mariadb-sink
