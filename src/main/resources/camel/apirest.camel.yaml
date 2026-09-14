@@ -35,9 +35,15 @@
       parameters:
         name: getAllclientes
       steps:
+        - setBody:
+            id: setBody-f664
+            expression:
+              constant:
+                id: constant-5f7e
+                expression: "{}"
         - log:
             id: log-dfb4
-            message: "ESTA ES UNA PRUEBA    :   [. ${body}.  ]"
+            message: "HA PASADO POR GET ALL CLIENT    :   [. ${body}.  ]"
         - to:
             id: to-485d
             uri: kamelet:mariadb-sink
@@ -98,6 +104,15 @@
       parameters:
         name: getItemById
       steps:
+        - setBody:
+            id: setBody-5fd9
+            expression:
+              constant:
+                id: constant-cf77
+                expression: "{}"
+        - log:
+            id: log-1717
+            message: "HA PASADO POR GET ALL CLIENT    :   [. ${body}.  ]"
         - to:
             id: to-485e
             uri: kamelet:mariadb-sink
@@ -161,8 +176,9 @@
             uri: kamelet:mariadb-sink
             parameters:
               query: >-
-                INSERT INTO clientes (name, description, price) VALUES
-                (:#${body[name]}, :#${body[description]}, :#${body[price]})
+                INSERT INTO clientes (nombre, apellido, email, rut,
+                fecha_nacimiento, telefono) 
+                        VALUES (:#${body[nombre]}, :#${body[apellido]}, :#${body[email]}, :#${body[rut]}, :#${body[fecha_nacimiento]}, :#${body[telefono]})
               username: "{{spring.datasource.username}}"
               password: "{{spring.datasource.password}}"
               serverName: mysql-23bdb174-karavan-project-api.d.aivencloud.com
@@ -274,6 +290,12 @@
       parameters:
         name: deleteItem
       steps:
+        - setBody:
+            id: setBody-05ad
+            expression:
+              constant:
+                id: constant-5489
+                expression: "{}"
         - to:
             id: to-b37a
             uri: kamelet:mariadb-sink
